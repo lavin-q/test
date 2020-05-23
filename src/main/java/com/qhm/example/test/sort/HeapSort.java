@@ -16,7 +16,7 @@ public class HeapSort {
 
     //给定数组从小到大排序
     public static void main(String[] args) {
-        int[] arr = new int[]{3, 6, 8, 5, 7, 4, 2};
+        int[] arr = new int[]{3, 6, 8, 5, 7, 4, 10, 50, 100, 1, 0, 0};
         int[] ints = heapConstract(arr);
         int size = arr.length;
         while (size > 1) {
