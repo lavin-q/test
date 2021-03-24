@@ -61,7 +61,7 @@ public class PublishServer {
         BufferedReader reader = null;//加载文件流
         try {
 
-            reader = new BufferedReader(new FileReader("H:\\test\\src\\main\\resources\\dbconfig.properties"));
+            reader = new BufferedReader(new FileReader("E:\\self\\test\\src\\main\\resources\\dbconfig.properties"));
             Properties prop = new Properties();//创建属性操作对象
             prop.load(reader);//加载流
             dbConfig = new DBConfig(prop.getProperty("url"),prop.getProperty("driver"),prop.getProperty("username"),prop.getProperty("password"));

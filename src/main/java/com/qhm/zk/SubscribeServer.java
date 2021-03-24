@@ -8,12 +8,10 @@ import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -27,6 +25,7 @@ public class SubscribeServer {
     private static DBConfig dbConfig;
     private static CuratorFramework client;
     private static NodeCache nodeCache = null;
+
 
     @PostConstruct
     public static void fun() throws InterruptedException {
@@ -49,16 +48,18 @@ public class SubscribeServer {
     }
 
     /**
-     *  读取本地配置文件到一个DBConfig对象中。
+     * 读取本地配置文件到一个DBConfig对象中。
      */
     public static void readConfig() {
         BufferedReader reader = null;//加载文件流
         System.out.println("读取本地数据库信息。。。。。。");
         try {
-            reader = new BufferedReader(new FileReader("H:\\test\\src\\main\\resources\\dbconfig.properties"));
+            String property = System.getProperty("user.dir") + "\\src\\main\\resources\\dbconfig.properties";
+            File file = ResourceUtils.getFile(property);
+            reader = new BufferedReader(new FileReader(file.getAbsolutePath()));
             Properties prop = new Properties();//创建属性操作对象
             prop.load(reader);//加载流
-            dbConfig = new DBConfig(prop.getProperty("url"),prop.getProperty("driver"),prop.getProperty("username"),prop.getProperty("password"));
+            dbConfig = new DBConfig(prop.getProperty("url"), prop.getProperty("driver"), prop.getProperty("username"), prop.getProperty("password"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -102,7 +103,7 @@ public class SubscribeServer {
                 }
             } else {//否则读取本地文件
                 readConfig();
-        }
+            }
             nodeCache.getListenable().addListener(new NodeCacheListener() {
                 @Override
                 public void nodeChanged() throws Exception {
