@@ -9,7 +9,8 @@ public class ZkLock {
     static int inventory = 10;
     private static final int NUM = 5;
 
-    private static Zk zk = new Zk();
+    //private static Zk zk = new Zk();
+    private static DisZkLock zk = new DisZkLock();
 
     public static void main(String[] args) {
         try {
