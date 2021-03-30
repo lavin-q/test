@@ -1,4 +1,4 @@
-package com.qhm.zk;
+package com.qhm.zk.zkLock;
 
 /**
  * @Description : 自实现CountDownLatch

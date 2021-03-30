@@ -10,13 +10,15 @@ import java.util.concurrent.CountDownLatch;
 public class NoLockTest implements Runnable {
 
 
-    static int intentory = 1;
+    static int inventory = 10;
     private static final int NUM = 10;
-    private static CountDownLatch cdl = new CountDownLatch(NUM);
+    private static CountDownLatch cdl = new CountDownLatch(10);
 
 
     public static void main(String[] args) {
-
+        long startTime;
+        long endTime;
+        startTime = System.currentTimeMillis();
         try {
 
             for (int i = 1; i <= NUM; i++) {
@@ -26,19 +28,19 @@ public class NoLockTest implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
+        endTime = System.currentTimeMillis();
+        System.out.println("执行线程数:" + NUM + "         总耗时：" + (endTime - startTime) + "         库存数为：" + inventory);
     }
 
     @Override
     public void run() {
         try {
             cdl.await();
-            if (intentory > 0) {
+            if (inventory > 0) {
                 Thread.sleep(5);
-                intentory--;
+                inventory--;
             }
-            System.out.println(intentory);
+            System.out.println(inventory);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
