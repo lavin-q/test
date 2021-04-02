@@ -1,5 +1,6 @@
 package com.qhm.redis;
 
+import com.qhm.thread.ThreadTest;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -18,7 +19,13 @@ public class RedisLockTest {
     private static volatile AtomicInteger inventory = new AtomicInteger(1001);
     //private static AtomicInteger inventory = new AtomicInteger(1001);
     private static final int NUM = 1000;
-    private static LinkedBlockingQueue linkedBlockingQueue = new LinkedBlockingQueue<>();
+    private static LinkedBlockingQueue linkedBlockingQueue = new LinkedBlockingQueue<>(10);
+    static ThreadPoolExecutor.CallerRunsPolicy c = new ThreadPoolExecutor.CallerRunsPolicy();
+    static ThreadPoolExecutor.AbortPolicy a = new ThreadPoolExecutor.AbortPolicy();
+    static ThreadPoolExecutor.DiscardPolicy d = new ThreadPoolExecutor.DiscardPolicy();
+    static ThreadPoolExecutor.DiscardOldestPolicy dop = new ThreadPoolExecutor.DiscardOldestPolicy();
+    //static DiscardOldestPolicy dop = new DiscardOldestPolicy();
+    static ThreadTest.MyIgnorePolicy m = new ThreadTest.MyIgnorePolicy();
     static CyclicBarrier cyclicBarrier = new CyclicBarrier(NUM);
     static RedisLock redisLock = new RedisLock();
     //可重入锁
@@ -38,10 +45,20 @@ public class RedisLockTest {
 
     static Jedis jedis = new JedisPool(config, "127.0.0.1", 6379, 1000, "qhm1997").getResource();
 
+    static class NameThreadFactory implements ThreadFactory {
+        private final AtomicInteger mThreadNum = new AtomicInteger(1);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, "my-thread-" + mThreadNum.getAndIncrement());
+            System.out.println(t.getName() + " has been created");
+            return t;
+        }
+    }
 
     public static void main(String[] args) throws BrokenBarrierException, InterruptedException {
         //jedis.select(1);
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(NUM, NUM, 10L, TimeUnit.SECONDS, linkedBlockingQueue);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 100, 10L, TimeUnit.SECONDS, linkedBlockingQueue, new NameThreadFactory(), m);
         //ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(inventory, inventory, 10L, TimeUnit.SECONDS, linkedBlockingQueue);
         //线程发令枪
         final CountDownLatch cdl = new CountDownLatch(NUM);
@@ -62,6 +79,7 @@ public class RedisLockTest {
                     //inventory.set(inventory.decrementAndGet());
                     //reentrantLock.unlock();
                     //}
+                    Thread.sleep(60);
                     System.out.println(Thread.currentThread().getName() + ":" + inventory.get());
                     cdl.countDown();
 
@@ -83,4 +101,6 @@ public class RedisLockTest {
         long endTime = System.currentTimeMillis();
         System.out.println("执行线程数:" + NUM + "         总耗时：" + (endTime - startTime) + "         库存数为：" + inventory.get());
     }
+
+
 }
