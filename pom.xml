@@ -188,6 +188,11 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.9.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.dellroad</groupId>
+            <artifactId>linode-apiv4-java</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

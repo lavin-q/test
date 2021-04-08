@@ -94,7 +94,6 @@ public class ThreadTest {
         public MyTask(String name) {
             this.name = name;
         }
-
         @Override
         public void run() {
             try {
